@@ -1,6 +1,8 @@
 package events
 
 import (
+	"fmt"
+
 	"github.com/dogmatiq/example/messages"
 )
 
@@ -28,4 +30,22 @@ type WithdrawalDeclined struct {
 	AccountID     string
 	Amount        int64
 	Reason        messages.DebitFailureReason
+}
+
+// String returns a human-readable description of the message.
+func (m *WithdrawalStarted) String() string {
+	return fmt.Sprintf(
+		"withdrawing %s from account %s",
+		messages.FormatAmount(m.Amount),
+		messages.FormatID(m.AccountID),
+	)
+}
+
+// String returns a human-readable description of the message.
+func (m *WithdrawalApproved) String() string {
+	return fmt.Sprintf(
+		"withdrawal approved for %s from account %s",
+		messages.FormatAmount(m.Amount),
+		messages.FormatID(m.AccountID),
+	)
 }

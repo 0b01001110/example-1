@@ -1,6 +1,10 @@
 package events
 
-import "github.com/dogmatiq/example/messages"
+import (
+	"fmt"
+
+	"github.com/dogmatiq/example/messages"
+)
 
 // TransferStarted is an event indicating that the process of transferring funds
 // from one account to another has begun.
@@ -29,4 +33,34 @@ type TransferDeclined struct {
 	ToAccountID   string
 	Amount        int64
 	Reason        messages.DebitFailureReason
+}
+
+// String returns a human-readable description of the message.
+func (m *TransferStarted) String() string {
+	return fmt.Sprintf(
+		"transfer %s from account %s to account %s",
+		messages.FormatAmount(m.Amount),
+		messages.FormatID(m.FromAccountID),
+		messages.FormatID(m.ToAccountID),
+	)
+}
+
+// String returns a human-readable description of the message.
+func (m *TransferApproved) String() string {
+	return fmt.Sprintf(
+		"transfer approved for %s from account %s to account %s",
+		messages.FormatAmount(m.Amount),
+		messages.FormatID(m.FromAccountID),
+		messages.FormatID(m.ToAccountID),
+	)
+}
+
+// String returns a human-readable description of the message.
+func (m *TransferDeclined) String() string {
+	return fmt.Sprintf(
+		"transfer declined for %s from account %s to account %s",
+		messages.FormatAmount(m.Amount),
+		messages.FormatID(m.FromAccountID),
+		messages.FormatID(m.ToAccountID),
+	)
 }

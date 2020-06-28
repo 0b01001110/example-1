@@ -1,5 +1,7 @@
 package events
 
+import "fmt"
+
 // CustomerAcquired is an event indicating that a new customer has been
 // acquired.
 type CustomerAcquired struct {
@@ -7,4 +9,12 @@ type CustomerAcquired struct {
 	CustomerName string
 	AccountID    string
 	AccountName  string
+}
+
+// String returns a human-readable description of the message.
+func (m *CustomerAcquired) String() string {
+	return fmt.Sprintf(
+		"acquired customer %s",
+		m.CustomerName,
+	)
 }
