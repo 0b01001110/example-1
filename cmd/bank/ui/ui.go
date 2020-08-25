@@ -2,8 +2,8 @@ package ui
 
 import (
 	"context"
+	"log"
 
-	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
 	"github.com/dogmatiq/dodeca/logging"
@@ -16,7 +16,7 @@ type UI struct {
 	Logger   logging.Logger
 	Executor dogma.CommandExecutor
 
-	state state
+	state *state
 }
 
 type state struct {
@@ -26,15 +26,17 @@ type state struct {
 
 // New returns a new UI.
 func New() *UI {
-	app := tview.NewApplication()
+	st := &state{
+		App:   tview.NewApplication(),
+		Pages: tview.NewPages(),
+	}
 
 	// Setup the pages that comprise the main content.
-	p := tview.NewPages()
-	p.AddPage("mainmenu", mainMenu(app), true, true)
+	st.Pages.AddPage("mainmenu", mainMenu(st), true, true)
 
 	// Initialize a text view for displaying log messages.
 	l := tview.NewTextView()
-	l.SetTitle("LOG")
+	l.SetTitle(" LOG ")
 	l.SetScrollable(true)
 	l.SetBorder(true)
 
@@ -42,27 +44,17 @@ func New() *UI {
 	// content and the log view.
 	f := tview.NewFlex()
 	f.SetDirection(tview.FlexRow)
-	f.AddItem(p, 0, 2, true)
+	f.AddItem(st.Pages, 0, 2, true)
 	f.AddItem(l, 0, 1, true)
 
-	app.SetRoot(f, true)
-
-	// Initialize the logger and wire it to the app such that pending log
-	// messages are flushed to the text view before the app is drawn.
-	log := &logger{
-		Text: l,
-	}
-	app.SetBeforeDrawFunc(func(tcell.Screen) bool {
-		log.flush()
-		return false
-	})
+	st.App.SetRoot(f, true)
 
 	return &UI{
-		Logger: log,
-		state: state{
-			App:   app,
-			Pages: p,
+		Logger: &logging.StandardLogger{
+			Target:       log.New(l, "", 0),
+			CaptureDebug: true,
 		},
+		state: st,
 	}
 }
 

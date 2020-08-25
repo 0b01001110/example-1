@@ -2,9 +2,9 @@ package ui
 
 import "github.com/rivo/tview"
 
-func mainMenu(app *tview.Application) tview.Primitive {
+func mainMenu(st *state) tview.Primitive {
 	menu := tview.NewList()
-	menu.SetTitle("MAIN MENU")
+	menu.SetTitle(" MAIN MENU ")
 	menu.SetBorder(true)
 	menu.SetBorderPadding(1, 1, 2, 2)
 
@@ -27,7 +27,7 @@ func mainMenu(app *tview.Application) tview.Primitive {
 		"Quit to terminal.",
 		'q',
 		func() {
-			app.Stop()
+			st.App.Stop()
 		},
 	)
 
