@@ -26,9 +26,11 @@ type state struct {
 
 // New returns a new UI.
 func New() *UI {
+	app := tview.NewApplication()
+
 	// Setup the pages that comprise the main content.
 	p := tview.NewPages()
-	// p.AddPage("mainmenu", mainMenu(), true, true)
+	p.AddPage("mainmenu", mainMenu(app), true, true)
 
 	// Initialize a text view for displaying log messages.
 	l := tview.NewTextView()
@@ -43,7 +45,6 @@ func New() *UI {
 	f.AddItem(p, 0, 2, true)
 	f.AddItem(l, 0, 1, true)
 
-	app := tview.NewApplication()
 	app.SetRoot(f, true)
 
 	// Initialize the logger and wire it to the app such that pending log
