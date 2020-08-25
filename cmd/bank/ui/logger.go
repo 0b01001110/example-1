@@ -48,9 +48,15 @@ func (l *logger) flush() {
 	l.m.Lock()
 	defer l.m.Unlock()
 
+	if l.pending.Len() == 0 {
+		return
+	}
+
 	// Append the new string to the existing log text. GetText() always returns
 	// a LF terminated string, so we do not need to add our own.
 	t := l.Text.GetText(false) + l.pending.String()
+
+	// Clear the buffer of pending messages.
 	l.pending.Reset()
 
 	// Trim the oldest lines until the length of the text falls back below the
