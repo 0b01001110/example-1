@@ -3,6 +3,10 @@ CGO_ENABLED = 1
 -include .makefiles/Makefile
 -include .makefiles/pkg/go/v1/Makefile
 
+.PHONY: run
+run: artifacts/build/debug/$(GOHOSTOS)/$(GOHOSTARCH)/bank
+	"$<"
+
 .PHONY: graph
 graph: artifacts/graph.png
 	open "$<"
