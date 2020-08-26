@@ -2,7 +2,6 @@ package ui
 
 import (
 	"context"
-	"log"
 	"sync"
 
 	"github.com/rivo/tview"
@@ -14,10 +13,9 @@ import (
 // UI encapsulates an interactive command-line interface for the example bank
 // application.
 type UI struct {
-	Logger logging.Logger
-
-	app   *tview.Application
-	pages *tview.Pages
+	logger *logger
+	app    *tview.Application
+	pages  *tview.Pages
 
 	m       sync.RWMutex
 	execCtx context.Context
@@ -29,20 +27,22 @@ type executor func(dogma.Message)
 
 // New returns a new UI.
 func New() *UI {
+	app := tview.NewApplication()
+
 	// Initialize a logger that writes to a text view.
 	logView := tview.NewTextView()
 	logView.SetTitle(" LOG ")
 	logView.SetScrollable(true)
 	logView.SetBorder(true)
 
-	logger := &logging.StandardLogger{
-		Target:       log.New(logView, "", 0),
-		CaptureDebug: true,
+	log := &logger{
+		App:  app,
+		Text: logView,
 	}
 
 	ui := &UI{
-		Logger: logger,
-		app:    tview.NewApplication(),
+		logger: log,
+		app:    app,
 		pages:  tview.NewPages(),
 	}
 
@@ -84,6 +84,7 @@ func (ui *UI) Run(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
+		ui.logger.close()
 		ui.app.Stop()
 	}()
 
@@ -97,17 +98,22 @@ func (ui *UI) SetExecutor(e dogma.CommandExecutor) {
 	ui.m.Unlock()
 }
 
+// Logger returns a logger that logs to the log pane of the UI.
+func (ui *UI) Logger() logging.Logger {
+	return ui.logger
+}
+
 // executeCommand executes a Dogma command.
 func (ui *UI) executeCommand(m dogma.Message) {
 	ui.m.RLock()
 	defer ui.m.RUnlock()
 
 	if ui.exec == nil {
-		ui.Logger.LogString("cannot execute command: no executor has been provided")
+		logging.LogString(ui.logger, "cannot execute command: no executor has been provided")
 		return
 	}
 
 	if err := ui.exec.ExecuteCommand(ui.execCtx, m); err != nil {
-		ui.Logger.Log("cannot execute command: %s", err)
+		logging.Log(ui.logger, "cannot execute command: %s", err)
 	}
 }

@@ -76,7 +76,7 @@ func runEngine(ctx context.Context, u *ui.UI) error {
 	}
 
 	// Create schema elements for infix, projection kit, and the bank example.
-	createSchema(ctx, db, driver, u.Logger)
+	createSchema(ctx, db, driver, u.Logger())
 
 	// Initialize the Infix engine itself.
 	e := infix.New(
@@ -87,16 +87,13 @@ func runEngine(ctx context.Context, u *ui.UI) error {
 				Driver: driver,
 			},
 		),
-		infix.WithLogger(u.Logger),
+		infix.WithLogger(u.Logger()),
 	)
 
 	u.SetExecutor(e)
 
 	// Run the engine until the context is canceled or an error occurs.
-	err = e.Run(ctx)
-	logging.Log(u.Logger, "infix has stopped: %s", err)
-
-	return err
+	return e.Run(ctx)
 }
 
 // createSchema creates the SQL schema needed by the dogmatiq/infix,
