@@ -90,6 +90,8 @@ func runEngine(ctx context.Context, u *ui.UI) error {
 		infix.WithLogger(u.Logger),
 	)
 
+	u.SetExecutor(e)
+
 	// Run the engine until the context is canceled or an error occurs.
 	err = e.Run(ctx)
 	logging.Log(u.Logger, "infix has stopped: %s", err)

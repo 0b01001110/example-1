@@ -2,7 +2,10 @@ package ui
 
 import "github.com/rivo/tview"
 
-func mainMenu(st *state) tview.Primitive {
+func mainMenuPage(
+	app *tview.Application,
+	pages *tview.Pages,
+) tview.Primitive {
 	menu := tview.NewList()
 	menu.SetTitle(" MAIN MENU ")
 	menu.SetBorder(true)
@@ -10,16 +13,18 @@ func mainMenu(st *state) tview.Primitive {
 
 	menu.AddItem(
 		"Sign-In",
-		"Sign-in to a customer account.",
-		'i',
+		"Sign-in as an existing customer.",
+		's',
 		func() {},
 	)
 
 	menu.AddItem(
-		"Sign-Up",
+		"New Customer",
 		"Open a bank account for a new customer.",
-		'u',
-		func() {},
+		'n',
+		func() {
+			pages.SwitchToPage("new-customer")
+		},
 	)
 
 	menu.AddItem(
@@ -27,7 +32,7 @@ func mainMenu(st *state) tview.Primitive {
 		"Quit to terminal.",
 		'q',
 		func() {
-			st.App.Stop()
+			app.Stop()
 		},
 	)
 
